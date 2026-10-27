@@ -1,0 +1,80 @@
+{
+  "id": "demoBErrAlert01",
+  "name": "DEMO B - Error alert (set as error workflow)",
+  "nodes": [
+    {
+      "id": "error-trigger",
+      "name": "Error trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "format-alert",
+      "name": "Format alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Builds a short alert text from an n8n Error Trigger payload.\n// Deliberately leaves out node input/output data, stack traces and credentials.\nconst err = $input.first().json;\nconst exec = err.execution || {};\nconst execError = exec.error || {};\nconst workflow = (err.workflow && err.workflow.name) || 'unknown workflow';\nconst node = (execError.node && execError.node.name) || 'unknown node';\nconst message = String(execError.message || 'no message').slice(0, 300);\nconst text = '[ALERT] ' + workflow + ' failed at \"' + node + '\": ' + message + '. Execution: ' + (exec.id || 'unknown');\nreturn [{ json: { text } }];\n"
+      }
+    },
+    {
+      "id": "send-alert",
+      "name": "Send alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ALERT_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Error trigger": {
+      "main": [
+        [
+          {
+            "node": "Format alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format alert": {
+      "main": [
+        [
+          {
+            "node": "Send alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

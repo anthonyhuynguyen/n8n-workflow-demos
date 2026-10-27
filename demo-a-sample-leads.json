@@ -1,0 +1,82 @@
+[
+  {
+    "submission_id": "DEMO-0001",
+    "name": "Dana Rivera",
+    "email": "dana.rivera@example.com",
+    "phone": "(408) 555-0101",
+    "company": "Example Plumbing Co",
+    "message": "We want automation to send a quote follow-up email after each estimate request.",
+    "source": "webform",
+    "_expected": "HTTP 200 status=processed label=qualified crm=upserted"
+  },
+  {
+    "submission_id": "DEMO-0002",
+    "name": "",
+    "email": "info@example.com",
+    "phone": "",
+    "company": "",
+    "message": "need help with stuff",
+    "source": "webform",
+    "_expected": "HTTP 200 status=processed label=needs_review; normalization_errors contains name_missing"
+  },
+  {
+    "submission_id": "DEMO-0001",
+    "name": "Dana Rivera",
+    "email": "dana.rivera@example.com",
+    "phone": "(408) 555-0101",
+    "company": "Example Plumbing Co",
+    "message": "Second submit of the same form.",
+    "source": "webform",
+    "_expected": "Send AFTER lead-01 succeeded. HTTP 200 status=duplicate_skipped; no LLM or CRM call"
+  },
+  {
+    "submission_id": "DEMO-0004",
+    "name": "Crypto Bonus",
+    "email": "promo@example.com",
+    "phone": "",
+    "company": "",
+    "message": "lol crypto giveaway click now!!!",
+    "source": "webform",
+    "_expected": "HTTP 200 status=processed label=not_a_fit"
+  },
+  {
+    "submission_id": "DEMO-0005",
+    "name": "No Contact",
+    "email": "not-an-email",
+    "phone": "12",
+    "company": "",
+    "message": "Please call me",
+    "source": "webform",
+    "_expected": "HTTP 422 status=rejected_invalid; errors include email_invalid, phone_invalid, no_valid_contact"
+  },
+  {
+    "submission_id": "DEMO-0006",
+    "name": "Sam Lee",
+    "email": "",
+    "phone": "+1 408 555 0166",
+    "company": "Lee Home Cleaning",
+    "message": "Looking for an invoice reminder automation.",
+    "source": "phone-form",
+    "_expected": "HTTP 200 status=processed label=qualified crm=skipped_no_email (no HubSpot call)"
+  },
+  {
+    "submission_id": "DEMO-0007",
+    "name": "Test Bad Json",
+    "email": "bad.json@example.com",
+    "phone": "",
+    "company": "",
+    "message": "CANNED_BAD_JSON booking automation request",
+    "source": "webform",
+    "_expected": "HTTP 200 status=processed label=needs_review; ai_output_valid=false (not_parseable_json)"
+  },
+  {
+    "submission_id": "DEMO-0008",
+    "name": "Test Bad Label",
+    "email": "bad.label@example.com",
+    "phone": "",
+    "company": "",
+    "message": "CANNED_BAD_LABEL quote automation request",
+    "source": "webform",
+    "_expected": "HTTP 200 status=processed label=needs_review; ai_output_valid=false (label_not_allowed)"
+  }
+]

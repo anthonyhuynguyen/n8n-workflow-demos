@@ -1,0 +1,166 @@
+{
+  "id": "demoBBefore0001",
+  "name": "DEMO B BEFORE - Lead intake sync (fragile)",
+  "nodes": [
+    {
+      "id": "lead-intake-webhook",
+      "name": "Lead intake webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "demo-b/lead-intake",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "webhookId": "demo-b-before-intake"
+    },
+    {
+      "id": "map-fields-hardcoded-",
+      "name": "Map fields (hardcoded)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        200
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "crm_url",
+              "value": "https://crm.example.com/api/v1/contacts",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "api_key",
+              "value": "REPLACE_ME_HARDCODED_KEY",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "source",
+              "value": "={{ $json.body.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "create-crm-contact",
+      "name": "Create CRM contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        200
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.crm_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ email: $json.email, name: $json.name, source: $json.source }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "mark-success",
+      "name": "Mark success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        200
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Lead intake webhook": {
+      "main": [
+        [
+          {
+            "node": "Map fields (hardcoded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map fields (hardcoded)": {
+      "main": [
+        [
+          {
+            "node": "Create CRM contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create CRM contact": {
+      "main": [
+        [
+          {
+            "node": "Mark success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
