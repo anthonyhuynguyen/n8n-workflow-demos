@@ -1,6 +1,6 @@
 # n8n workflow demos (illustration projects, not client work)
 
-Two small n8n projects that show how I work: reproduce a failure, fix the cause, and re-run the tests. These are **demo projects**, not client work. AI-assisted, reviewed and delivered by me.
+Two small n8n projects that show how I work: reproduce a failure, fix the cause, and re-run the tests. These are **demo projects**, not client work.
 
 ## Demo A: AI lead qualification (webhook -> HubSpot)
 `demo-a-lead-qualification.json` (n8n workflow, no secrets, placeholder credential ids), `demo-a-README.md` (setup), `demo-a-sample-leads.json` (8 test leads), `demo-a-mock-server.js` and `demo-a-run-sample-leads.js` (local mocks and test driver).
